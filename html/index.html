@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/vis/dist/vis.min.js"></script>
+    <script src="data.js"></script>
+    <link href="node_modules/vis/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
+
+    <style type="text/css">
+      #mynetwork {
+      width: 800px;
+      height: 600px;
+      border: 1px solid lightgray;
+      }
+    </style>
+  </head>
+  <body>
+    <p>
+      Create a simple network with some nodes and edges.
+    </p>
+
+    <div id="mynetwork"></div>
+
+    <input type="button" onclick="clusterByGroup()" value="Cluster Groups"> <br />
+    
+    <script type="text/javascript">
+    var groups = new Set();
+
+    function populate_host(host) {
+       if (host['label'].startsWith("192.168.")) {
+           nodes.update([{id:host['id'], group:'local'}]);
+       } else {
+	   $.ajax({
+	      url: 'http://whois.arin.net/rest/ip/' + host['label'],
+	      dataType: 'json',
+	   }).done(function( json ) {
+	      var label=json['net']['name']['$'] + "\n" + host['label'];
+              var title=json['net']['orgRef']["@name"];
+              var group=json['net']['orgRef']["@handle"];
+              groups.add(group);
+              nodes.update([{id:host['id'], label:label, title:title, group:group}]);
+           });
+       }
+    }
+
+    function clusterByGroup() {
+	network.setData(data);
+
+	groups.forEach(function(group) {
+	    var clusterOptionsByData = {
+		joinCondition:function(childOptions) {
+		    return childOptions.group == group;
+		},
+		clusterNodeProperties: {label:group, id:group, borderWidth:3, shape:'star'}
+	    };
+	    network.cluster(clusterOptionsByData);
+	});
+    }
+
+    nodes.forEach(populate_host);
+
+    // create a network
+    var container = document.getElementById('mynetwork');
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+    var options = {edges: {arrows: 'to'}};
+    var network = new vis.Network(container, data, options);
+    </script>    
+  </body>
+</html>
