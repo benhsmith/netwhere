@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <tins/tins.h>
 
-#include "pointer_iterator.h"
+#include "pointer_iterator.hpp"
 
 class Host {
 public:
@@ -40,7 +40,7 @@ public:
       out_flows.insert({flow.dst_addr(), &flow});
   }
 
-  const Tins::IPv4Address& ip_addr() { return ip; }
+  const Tins::IPv4Address& ip_addr() const { return ip; }
 
   const FlowRange get_in_flows() { return FlowRange(in_flows); }
   const FlowRange get_out_flows() { return FlowRange(out_flows); }
@@ -53,7 +53,7 @@ public:
 
 class HostMap {
 public:
-  typedef PointerIteratorWrapper<std::unordered_map<Tins::IPv4Address, Host*>::iterator, Host> Iterator;
+  typedef PointerIteratorWrapper<std::unordered_map<Tins::IPv4Address, Host*>::const_iterator, const Host> Iterator;
     
   Host& operator [] (const Tins::IPv4Address& key) {
     auto item = hosts_by_ip.find(key);
@@ -68,11 +68,11 @@ public:
     }
   }
 
-  Iterator begin() {
+  const Iterator begin() const {
     return Iterator(hosts_by_ip.begin());
   }
 
-  Iterator end() {
+  const Iterator end() const {
     return Iterator(hosts_by_ip.end());
   }
 

@@ -3,7 +3,6 @@
   <head>
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="node_modules/vis/dist/vis.min.js"></script>
-    <script src="data.js"></script>
     <link href="node_modules/vis/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
 
     <style type="text/css">
@@ -24,8 +23,31 @@
     <input type="button" onclick="clusterByGroup()" value="Cluster Groups"> <br />
     
     <script type="text/javascript">
+    var nodes;
+    var edges;
+    var network;
+    var data;
     var groups = new Set();
 
+    $.ajax({
+	url: 'http://localhost:8080',
+	dataType: 'json',
+    }).done(function( json ) {
+	nodes = new vis.DataSet(json['nodes']);
+	edges =  new vis.DataSet(json['edges']);
+
+	// create a network
+	var container = document.getElementById('mynetwork');
+	data = {
+            nodes: nodes,
+            edges: edges
+	};
+	var options = {edges: {arrows: 'to'}, physics: false};
+	network = new vis.Network(container, data, options);
+	
+	data['nodes'].forEach(populate_host);
+    });
+      
     function populate_host(host) {
        if (host['label'].startsWith("192.168.")) {
            nodes.update([{id:host['id'], group:'local'}]);
@@ -57,16 +79,6 @@
 	});
     }
 
-    nodes.forEach(populate_host);
-
-    // create a network
-    var container = document.getElementById('mynetwork');
-    var data = {
-        nodes: nodes,
-        edges: edges
-    };
-    var options = {edges: {arrows: 'to'}};
-    var network = new vis.Network(container, data, options);
     </script>    
   </body>
 </html>

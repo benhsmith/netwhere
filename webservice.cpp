@@ -1,8 +1,12 @@
+#include <sstream>
+#include <tins/tins.h>
+
 #include "webservice.h"
 
 using namespace std;
+using namespace Tins;
 
-int WebService::handle_request(void * cls,
+int WebService::on_request(void * cls,
 		    struct MHD_Connection * connection,
 		    const char * url,
 		    const char * method,
@@ -26,10 +30,13 @@ int WebService::handle_request(void * cls,
   if (0 != *upload_data_size)
     return MHD_NO; /* upload data in a GET!? */
 
-  string page = "hello";
+  WebService* webservice = static_cast<WebService*>(cls);
+    
+  const string& data = webservice->functor(url);
+    
   *ptr = NULL; /* clear context pointer */
-  response = MHD_create_response_from_buffer (page.size(),
-                                              const_cast<char*>(page.c_str()),
+  response = MHD_create_response_from_buffer (data.size(),
+                                              const_cast<char*>(data.c_str()),
   					      MHD_RESPMEM_PERSISTENT);
   ret = MHD_queue_response(connection,
 			   MHD_HTTP_OK,

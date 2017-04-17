@@ -6,8 +6,9 @@
 
 #include <tins/tins.h>
 
-#include "flow.h"
-#include "host.h"
+#include "flow.hpp"
+#include "host.hpp"
+#include "netwhere.hpp"
 
 using namespace std;
 using namespace Tins;
@@ -33,4 +34,17 @@ BOOST_AUTO_TEST_CASE( hash_map_create ) {
   Host& host2 = hosts[src];
 
   BOOST_CHECK_EQUAL(&host1, &host2);
+}
+
+BOOST_AUTO_TEST_CASE( handle_request ) {
+  string output = "var nodes = new vis.DataSet([\n"
+    "]);\n"
+    "var edges = new vis.DataSet([\n"
+    "]);\n";
+
+  NetWhere netwhere;
+
+  BOOST_CHECK_EQUAL(netwhere.handle_request(""), output);
+
+  BOOST_CHECK_EQUAL(netwhere.handle_request("/"), output);
 }

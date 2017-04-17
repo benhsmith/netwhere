@@ -6,7 +6,7 @@
 
 #include <tins/tins.h>
 
-#include "pointer_iterator.h"
+#include "pointer_iterator.hpp"
 
 class Flow {
 public:
@@ -46,7 +46,7 @@ class FlowMap {
 public:
   typedef std::unordered_map<ip_pair, Flow*> IpsFlowMap;
   typedef PointerIteratorWrapper<IpsFlowMap::const_iterator, const Flow> Iterator;
-
+  
   Flow& operator [] (const ip_pair &key) {
     auto item = flows_by_ips.find(key);
     if (item == flows_by_ips.end())
@@ -62,7 +62,7 @@ public:
 
   Iterator begin() const { return Iterator(flows_by_ips.begin()); }
   Iterator end() const { return Iterator(flows_by_ips.end()); }
-  
+
 private:
   IpsFlowMap flows_by_ips;
 };
