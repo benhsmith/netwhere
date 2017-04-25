@@ -7,44 +7,43 @@
 #include <tuple>
 #include <unordered_map>
 
+#include <boost/format.hpp>
+
 #include "netwhere.hpp"
 
-using namespace Tins;
 using namespace std;
 using namespace std::placeholders;
-
+using namespace boost;
+using namespace Tins;
 
 void NetWhere::start() {
   auto functor = bind(&NetWhere::handle_request,this,_1);
   WebService<decltype(functor)> webservice(functor);
   webservice.start();
   
-  Sniffer("enp0s31f6").sniff_loop(bind(&NetWhere::handle_packet,this,_1));
+  Sniffer(interface).sniff_loop(bind(&NetWhere::handle_packet,this,_1));
 }
 
 bool NetWhere::handle_packet(const PDU &pdu) {
-    const IP &ip = pdu.rfind_pdu<IP>(); // Find the IP layer
-    const TCP &tcp = pdu.rfind_pdu<TCP>(); // Find the TCP layer
+  const IP &ip = pdu.rfind_pdu<IP>();
+  const TCP &tcp = pdu.rfind_pdu<TCP>();
 
-    rw_exclusion.writer_acquire();
+  rw_exclusion.writer_acquire();
 
-    Flow& flow = flows[make_tuple(ip.src_addr(), ip.dst_addr())];
+  if (internal_range.contains(ip.src_addr())) {
+    Host& host = hosts[ip.src_addr()];
+    host.add_out_flow(ip.dst_addr(), ip.tot_len() - ip.header_size());
+  } else if (internal_range.contains(ip.dst_addr()))  {
+    Host& host = hosts[ip.dst_addr()];
+    host.add_in_flow(ip.src_addr(), ip.tot_len() - ip.header_size());
+  }
 
-    Host& src = hosts[ip.src_addr()];
-    Host& dst = hosts[ip.dst_addr()];
+  rw_exclusion.writer_release();
 
-    src.add_out_flow(flow);
-    dst.add_in_flow(flow);
-
-    flow += 1;
-
-    rw_exclusion.writer_release();
-
-    return true;
+  return true;
 }
 
 string NetWhere::handle_request(const string& url) {
-  cout << "Request received : " << url << endl;
   size_t len = url.size();
 
   if (len == 0) {
@@ -56,46 +55,38 @@ string NetWhere::handle_request(const string& url) {
   if (start == len-1)
     return full_stats();
 
-  int counter;
-
-  try {
-    int counter = stoi(url.substr(start + 1, len - (start + 1)));
-  } catch (invalid_argument) {
-    cout << "Invalid URL : " << url << endl;
-    return "";
-  }
-
-  return stats_since_counter(counter);
+  cout << "Invalid URL : " << url << endl;
 }
 
 string NetWhere::full_stats() {
+  rw_exclusion.reader_acquire();
+
   ostringstream out;
   
-  IPv4Range local_range = IPv4Address("192.168.0.0") / 24;
+  out << "{";
 
-  out << "{ \"nodes\": [" << endl;
   for (auto it = hosts.begin(); it != hosts.end(); ++it) {
     if (it != hosts.begin()) {
-      out << ", ";
-    }
-  
-    out << "{ \"id\": " << static_cast<uint32_t>((*it).ip_addr()) << ", \"label\": \"" << (*it).ip_addr() << "\"}";
-  }
-  
-  out << "]," << endl;
-  out << "\"edges\" : [" << endl;
-
-  for (auto it = flows.begin(); it != flows.end(); ++it) {
-    if (it != flows.begin()) {
-      out << ", ";
+      out << ",";
     }
 
-    out << "{\"from\": " << static_cast<uint32_t>((*it).src_addr())
-	 << ", \"to\": " <<  static_cast<uint32_t>((*it).dst_addr())
-	 << ", \"label\":" << (*it).packets_seen() << "}";
+    out << endl << format("\"%1%\": [") % (*it).ip_addr();
+    
+    auto peers = (*it).get_peers();
+    for (auto peer_it = peers.begin(); peer_it != peers.end(); ++peer_it) {
+      if (peer_it != peers.begin()) {
+	out << ", ";
+      }
+
+      out << format("[\"%1%\", %2%, %3%]") % (*peer_it).first % get<0>((*peer_it).second) %get<1>((*peer_it).second);
+    }
+
+    out << "]";
   }
   
-  out << "]}" << endl;
+  out << "}" << endl;
+
+  rw_exclusion.reader_release();
 
   return out.str();
 }

@@ -6,24 +6,11 @@
 
 #include <tins/tins.h>
 
-#include "flow.hpp"
 #include "host.hpp"
 #include "netwhere.hpp"
 
 using namespace std;
 using namespace Tins;
-
-BOOST_AUTO_TEST_CASE( flow_map_create ) {
-  FlowMap flows;
-
-  IPv4Address src = IPv4Address("192.168.0.123");
-  IPv4Address dst = IPv4Address("192.168.0.124");
-  
-  Flow &flow1 = flows[make_tuple(src, dst)];
-  Flow &flow2 = flows[make_tuple(src, dst)];
-
-  BOOST_CHECK_EQUAL(&flow1, &flow2);
-}
 
 BOOST_AUTO_TEST_CASE( hash_map_create ) {
   HostMap hosts;
@@ -37,12 +24,9 @@ BOOST_AUTO_TEST_CASE( hash_map_create ) {
 }
 
 BOOST_AUTO_TEST_CASE( handle_request ) {
-  string output = "var nodes = new vis.DataSet([\n"
-    "]);\n"
-    "var edges = new vis.DataSet([\n"
-    "]);\n";
+  string output = "{}\n";
 
-  NetWhere netwhere;
+  NetWhere netwhere("", Tins::IPv4Range("192.168.0.0", "255.255.255.0"));
 
   BOOST_CHECK_EQUAL(netwhere.handle_request(""), output);
 

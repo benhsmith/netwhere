@@ -2,25 +2,14 @@
 #define __HOST_H__
 
 #include <unordered_map>
+#include <tuple>
 #include <tins/tins.h>
 
 #include "pointer_iterator.hpp"
 
 class Host {
 public:
-  typedef std::unordered_map<Tins::IPv4Address, const Flow*> IpFlowMap;
-  typedef PointerIteratorWrapper<IpFlowMap::const_iterator, const Flow> FlowIterator;
-
-  struct FlowRange {
-  public:
-    FlowRange(const IpFlowMap& map) : map(map) {}
-				 
-    FlowIterator begin() const { return FlowIterator(map.begin()); }
-    FlowIterator end() const { return FlowIterator(map.end()); }
-
-  private:
-    const IpFlowMap &map;
-  };
+  typedef std::unordered_map<Tins::IPv4Address, std::tuple<size_t, size_t>> PeerMap;
 
   Host(const Tins::IPv4Address ip) : ip(ip) {}
 
@@ -28,27 +17,29 @@ public:
     return ip < rhs.ip;
   }
 
-  void add_in_flow(const Flow &flow) {
-    auto item = in_flows.find(flow.src_addr());
-    if (item == in_flows.end())
-      in_flows.insert({flow.src_addr(), &flow});
+  void add_in_flow(const Tins::IPv4Address peer_ip, size_t len) {
+    auto it = peers.find(peer_ip);
+    if (it == peers.end())
+      peers.insert({peer_ip, std::make_tuple(0,0)});
+
+    std::get<0>(peers[peer_ip]) += len;
   }
 
-  void add_out_flow(const Flow &flow) {
-    auto item = out_flows.find(flow.dst_addr());
-    if (item == out_flows.end())
-      out_flows.insert({flow.dst_addr(), &flow});
+  void add_out_flow(const Tins::IPv4Address peer_ip, size_t len) {
+    auto it = peers.find(peer_ip);
+    if (it == peers.end())
+      peers.insert({peer_ip, std::make_tuple(0,0)});
+
+    std::get<1>(peers[peer_ip]) += len;
   }
 
   const Tins::IPv4Address& ip_addr() const { return ip; }
 
-  const FlowRange get_in_flows() { return FlowRange(in_flows); }
-  const FlowRange get_out_flows() { return FlowRange(out_flows); }
+  const PeerMap& get_peers() const { return peers; }
 
  private:
   const Tins::IPv4Address ip;
-  IpFlowMap in_flows;
-  IpFlowMap out_flows;
+  PeerMap peers;
 };
 
 class HostMap {
