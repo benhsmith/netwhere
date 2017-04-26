@@ -1,7 +1,7 @@
-This is a preliminary, draft, prototype of a packet analyzer. The reasons for this project are:
+This is a preliminary, draft, prototype of a network monitor. The reasons for this project are:
 
-# I wanted a way to summarize traffic on an OpenWrt router but nothing I found quite did what I wanted.
-# After attending a C++ user's group I wanted to play around with modern C++ and needed a project.
+* I wanted a way to summarize traffic on an OpenWrt router but nothing I found quite did what I wanted.
+* After attending a C++ user's group I wanted to play around with modern C++ and needed a project.
 
 The design, currently, is a simple binary that monitors flows in and out of the local network and serves the data up via a REST endpoint that provides the summarized flow data to clients.
 A javascript frontend queries the endpoint, gathers any additional information that might be useful and provides an interactive view of the data. I want to put as much of the work as possible
