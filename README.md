@@ -12,6 +12,8 @@ The frontend part of this is some cobbled together javascript to see what I can 
 
 ## Dependencies
 
-https://http://libtins.github.io/
-https://www.gnu.org/software/libmicrohttpd/
-http://www.boost.org/
+https://libtins.github.io
+
+https://www.gnu.org/software/libmicrohttpd
+
+http://www.boost.org
