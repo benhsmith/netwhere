@@ -7,6 +7,28 @@
 
 class ReaderWriterExclusion {
 public:
+  class ReaderGuard {
+  public:
+	ReaderGuard(ReaderWriterExclusion &exclusion) : exclusion(exclusion) {
+	  exclusion.reader_acquire();
+	}
+	~ReaderGuard() { exclusion.reader_release(); }
+
+  private:
+	ReaderWriterExclusion& exclusion;
+  };
+
+  class WriterGuard {
+  public:
+	WriterGuard(ReaderWriterExclusion &exclusion) : exclusion(exclusion) {
+	  exclusion.writer_acquire();
+	}
+	~WriterGuard() { exclusion.writer_release(); }
+	
+  private:
+	ReaderWriterExclusion& exclusion;
+  };
+
   ReaderWriterExclusion() : writing(false), num_readers(0) {}
 
   void reader_acquire() {
@@ -34,7 +56,7 @@ public:
     writing = false;
     cv.notify_all();
   }
-
+  
 private:
   std::mutex mtx;
   std::condition_variable cv;

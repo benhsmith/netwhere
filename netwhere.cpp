@@ -16,29 +16,19 @@ using namespace std::placeholders;
 using namespace boost;
 using namespace Tins;
 
+
 void NetWhere::start() {
   auto functor = bind(&NetWhere::handle_request,this,_1);
   WebService<decltype(functor)> webservice(functor);
   webservice.start();
   
-  Sniffer(interface).sniff_loop(bind(&NetWhere::handle_packet,this,_1));
+  Sniffer(_interface).sniff_loop(bind(&NetWhere::handle_packet,this,_1));
 }
 
 bool NetWhere::handle_packet(const PDU &pdu) {
-  const IP &ip = pdu.rfind_pdu<IP>();
-  const TCP &tcp = pdu.rfind_pdu<TCP>();
+  ReaderWriterExclusion::WriterGuard guard(_rw_exclusion);
 
-  rw_exclusion.writer_acquire();
-
-  if (internal_range.contains(ip.src_addr())) {
-    Host& host = hosts[ip.src_addr()];
-    host.add_out_flow(ip.dst_addr(), ip.tot_len() - ip.header_size());
-  } else if (internal_range.contains(ip.dst_addr()))  {
-    Host& host = hosts[ip.dst_addr()];
-    host.add_in_flow(ip.src_addr(), ip.tot_len() - ip.header_size());
-  }
-
-  rw_exclusion.writer_release();
+  _collector.collect(time(nullptr), pdu);
 
   return true;
 }
@@ -47,50 +37,51 @@ string NetWhere::handle_request(const string& url) {
   size_t len = url.size();
 
   if (len == 0) {
-    return full_stats();
+    return hosts();
   }
   
   size_t start = url.find_last_of('/');
   
   if (start == len-1)
-    return full_stats();
+    return hosts();
 
   cout << "Invalid URL : " << url << endl;
 }
 
-string NetWhere::full_stats() {
-  rw_exclusion.reader_acquire();
+string NetWhere::hosts() {
+  ReaderWriterExclusion::ReaderGuard guard(_rw_exclusion);
 
   ostringstream out;
   
   out << "{";
 
-  for (auto it = hosts.begin(); it != hosts.end(); ++it) {
-    if (it != hosts.begin()) {
+  for (auto it = _collector.hosts().begin(); it != _collector.hosts().end(); ++it) {
+    if (it != _collector.hosts().begin()) {
       out << ",";
     }
 
-    out << endl << format("\"%1%\": [") % (*it).ip_addr();
-    
-    auto peers = (*it).get_peers();
-    for (auto peer_it = peers.begin(); peer_it != peers.end(); ++peer_it) {
-      if (peer_it != peers.begin()) {
-	out << ", ";
+	const HostFlows& flows = (*it).second;
+    out << endl << format("\"%1%|%2%\": [") % flows.host().ip % flows.host().hw;
+	
+    for (auto flow_it = flows.flows().begin(); flow_it != flows.flows().end(); ++flow_it) {
+      if (flow_it != flows.flows().begin()) {
+		out << ", ";
       }
 
-      out << format("[\"%1%\", %2%, %3%]") % (*peer_it).first % get<0>((*peer_it).second) %get<1>((*peer_it).second);
+	  const FlowSummary* summary = (*flow_it);
+
+      out << format("[ [\"%1%\", \"%2%\"], [\"%3%\", \"%4%\", %5%], %6%, %7% ]")
+		% summary->flow().src_hw % summary->flow().src_ip
+		% summary->flow().dst_hw % summary->flow().dst_ip % summary->flow().dst_port
+		% summary->bytes_src() % summary->bytes_dst();
     }
 
-    out << "]";
+	out << "]";
   }
   
   out << "}" << endl;
 
-  rw_exclusion.reader_release();
+  _rw_exclusion.reader_release();
 
   return out.str();
-}
-
-string NetWhere::stats_since_counter(int counter) {
-  return "";
 }

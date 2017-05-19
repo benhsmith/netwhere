@@ -2,118 +2,49 @@
 <html>
   <head>
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="node_modules/vis/dist/vis.min.js"></script>
-    <link href="node_modules/vis/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">
+	<script src="netwhere.js"></script>
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
-    <link rel="stylesheet" type="text/css" href="netwhere.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">
+	<link rel="stylesheet" href="https://cdn.rawgit.com/Chalarangelo/mini.css/v2.2.0/dist/mini-default.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">	
   </head>
   <body>
-    <div id="hosts_container">
-      <ul id="hosts_list"></ul>
-    </div>
+	<div class="container">
+	  <div class="row">
+		<div class="col-md-2">
+		  <nav id="hosts_list"></nav>
+		</div>
+		<div class="col-md-10">
+		  <h2 id="host_name"></h2>
+		  <table id="hosts_table" paging=false class="display">
+			<thead>
+			  <tr>
+				<th>IP</th><th>Name</th><th>Network</th><th>In</th><th>Out</th>
+			  </tr>
+			</thead>
+			<tbody>
+			</tbody>
+		  </table>
     
-    <table id="hosts_table" paging=false class="display">
-      <thead>
-	<tr>
-	  <th>IP</th><th>Name</th><th>Network</th><th>In</th><th>Out</th>
-	</tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
-    
-    <table id="networks_table" paging=false class="display">
-      <thead>
-	<tr>
-	  <th>Network</th><th>In</th><th>Out</th>
-	</tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
-
+		  <table id="networks_table" paging=false class="display">
+			<thead>
+			  <tr>
+				<th>Network</th><th>In</th><th>Out</th>
+			  </tr>
+			</thead>
+			<tbody>
+			</tbody>
+		  </table>
+        </div>
+	  </div>
+	</div>
     <script type="text/javascript">
-    var hosts;
-    var orgs = {};
-    var hosts_table;
-    var networks_table;
-
-    function populate_host(hosts_table, networks_table, row) {
-	$.ajax({
-            url: 'http://whois.arin.net/rest/ip/' + row[0],
-	    dataType: 'json',
-	}).done(function( json ) {
-	    var org_name;
-
-	    if (json['net']['orgRef']) {
-		org_name = json['net']['orgRef']["@name"];
-		var org_handle = json['net']['orgRef']["@handle"];
-
-		if (!(org_handle in orgs)) {
-		    new_row = networks_table.row.add([org_name + ' (' + org_handle + ')',0,0]);
-		    orgs[org_handle] = new_row;
-		    
-		}
-
-		new_row = orgs[org_handle];
-		data = new_row.data();
-		data[1] += row[1];
-		data[2] += row[2];
-		new_row.data(data).draw();
-	    }
-	    
-	    hosts_table.row.add([row[0],
-			      json['net']['name']['$'],
-			     org_name,
-			     row[1],
-			     row[2]
-			     ]).draw();
-        });
-    }
-
-    function fill_tables(elem, host) {
-    	$('.current_selection').removeClass("current_selection"); 
-        $(elem).addClass("current_selection");
-	hosts_table.clear();
-	networks_table.clear();
-	orgs = {};
-
-	hosts[host].forEach( function(row) {
-	    populate_host(hosts_table, networks_table, row);
-	});
-    }
-
-
-    function get_flows(hosts_table, networks_table) {
-	$.ajax({
-	    url: 'http://192.168.0.10:8080',
-	    dataType: 'json',
-	}).done(function( json ) {
-	    hosts = json;
-	    for (host in hosts) {
-		$('#hosts_list').append(
-		    $( "<li/>", {html:
-		       $( "<a/>", {
-			   href: "#",
-			   html: host,
-			   onclick: 'fill_tables(this, "' + host + '")'
-		       })
-		    })
-		);
-	    }
-	    
-	    //json['192.168.0.25'].forEach( function(row) {
-	    //	populate_host(hosts_table, networks_table, row);
-	    //});
-	});
-    }
 
     $(document).ready( function () {
-	hosts_table = $('#hosts_table').DataTable({ searching: false });
-	networks_table = $('#networks_table').DataTable({ searching: false });
-
-	get_flows(hosts_table, networks_table);
+	    var params = document.URL.slice(document.URL.indexOf('?')+1).split('=');
+	    if (params[0] == 'collector') {
+			get_flows(params[1], "#hosts_table", "#networks_table", "#host_name");
+		}
     });
 
     </script>    
