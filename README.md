@@ -28,6 +28,13 @@ Load html/index.html in a browser with a URL parameter of collector=host:ip
 
 The collector currently always listens on 8080. That should probably be a command line parameter.
 
+## Build
+
+    mkdir build
+	cd build
+	cmake ..
+    make
+
 ## Dependencies
 
 https://libtins.github.io
