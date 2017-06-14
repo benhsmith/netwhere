@@ -22,7 +22,7 @@ For example:
 
     netwhere eth0 192.168.0.0 255.255.255.0
 
-Load html/index.html in a browser with a URL parameter of collector=host:ip
+Load html/index.html in a browser with a URL parameter of collector=host:ip, e.g.:
 
     http://localhost/netwhere/?collector=192.168.0.33:8080#
 

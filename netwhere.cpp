@@ -21,14 +21,20 @@ void NetWhere::start() {
   auto functor = bind(&NetWhere::handle_request,this,_1);
   WebService<decltype(functor)> webservice(functor);
   webservice.start();
-  
+
   Sniffer(_interface).sniff_loop(bind(&NetWhere::handle_packet,this,_1));
 }
 
 bool NetWhere::handle_packet(const PDU &pdu) {
   ReaderWriterExclusion::WriterGuard guard(_rw_exclusion);
 
-  _collector.collect(time(nullptr), pdu);
+  time_t now = time(nullptr);
+  _collector.collect(now, pdu);
+
+  if (now - _last_stats > _print_stats_interval) {
+	print_stats();
+	_last_stats = now;
+  }
 
   return true;
 }
@@ -39,9 +45,9 @@ string NetWhere::handle_request(const string& url) {
   if (len == 0) {
     return hosts();
   }
-  
+
   size_t start = url.find_last_of('/');
-  
+
   if (start == len-1)
     return hosts();
 
@@ -52,7 +58,7 @@ string NetWhere::hosts() {
   ReaderWriterExclusion::ReaderGuard guard(_rw_exclusion);
 
   ostringstream out;
-  
+
   out << "{";
 
   for (auto it = _collector.hosts().begin(); it != _collector.hosts().end(); ++it) {
@@ -62,7 +68,7 @@ string NetWhere::hosts() {
 
 	const HostFlows& flows = (*it).second;
     out << endl << format("\"%1%|%2%\": [") % flows.host().ip % flows.host().hw;
-	
+
     for (auto flow_it = flows.flows().begin(); flow_it != flows.flows().end(); ++flow_it) {
       if (flow_it != flows.flows().begin()) {
 		out << ", ";
@@ -78,10 +84,17 @@ string NetWhere::hosts() {
 
 	out << "]";
   }
-  
+
   out << "}" << endl;
 
   _rw_exclusion.reader_release();
 
   return out.str();
+}
+
+void NetWhere::print_stats() {
+  cout << endl;
+  cout << _collector.hosts().size() << " hosts" << endl;
+  cout << _collector.tcp_flows().size() << " TCP flows" << endl;
+  cout << _collector.udp_flows().size() << " UDP flows" << endl;
 }
