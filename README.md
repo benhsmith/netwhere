@@ -40,7 +40,7 @@ A webserver provides host and flow information. Currently the webserver always l
 
 There are two endoints:
 - / : returns a list of hosts
-- /IP-MAC : returns flows for a host
+- /MAC-IP : returns flows for a host
 
 ### / endpoint
 Returns a JSON array. The array will have one entry per Netwhere host. Each host entry has the structure:
@@ -59,7 +59,8 @@ where
       ["192.168.0.124","aa:bb:cc:dd:ff:ee","hostname2"]
     ]
 
-### /? endpoint
+### /?MAC-IP endpoint
+The *path* portion of the URL should be a host identifier of the form: MAC-IP.
 Returns a JSON array. Each entry in the array represents a flow. Each flow entry has the structure:
 
     [
