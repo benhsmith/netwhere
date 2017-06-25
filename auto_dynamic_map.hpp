@@ -20,8 +20,8 @@ class AutoDerefPointer : public std::unique_ptr<Value> {
 public:
   AutoDerefPointer(Value * obj) : std::unique_ptr<Value>(obj) {}
 
-  operator Value& () { return *(this->get()); } 
-  operator const Value& () const { return *(this->get()); } 
+  operator Value& () { return *(this->get()); }
+  operator const Value& () const { return *(this->get()); }
 };
 
 template <typename Key, typename Value>
@@ -29,7 +29,7 @@ class AutoDynamicMap : public std::unordered_map<Key, AutoDerefPointer<Value>> {
 public:
 
   typedef std::unordered_map<Key, std::unique_ptr<Value>> map_type;
- 
+
   Value& operator [] (const Key& key) {
     auto item = this->find(key);
     if (item == this->end()) {

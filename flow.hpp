@@ -11,7 +11,7 @@
 struct Flow {
   Flow(const Tins::EthernetII::address_type& src_hw,
 	   const Tins::IPv4Address& src_ip,
-	   const Tins::EthernetII::address_type& dst_hw,	   
+	   const Tins::EthernetII::address_type& dst_hw,
 	   const Tins::IPv4Address& dst_ip,
 	   int dst_port,
 	   uint8_t ip_protocol)
@@ -54,7 +54,7 @@ public:
   size_t bytes_src() const { return _bytes_to_src; }
   size_t bytes_dst() const { return _bytes_to_dst; }
   time_t modified_at() const { return _modified_at; }
-				 
+
 private:
   const Flow _flow;
   size_t _bytes_to_src;

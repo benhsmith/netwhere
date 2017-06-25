@@ -9,15 +9,16 @@
 
 struct Host {
   Host(const Tins::ARP::hwaddress_type hw, const Tins::IPv4Address ip)
-	: hw(hw), ip(ip) {}
+	: hw(hw), ip(ip) {
+  }
 
   bool operator == (const Host& other) const {
 	return hw == other.hw
 	  && ip == other.ip;
   }
-  
+
   const Tins::ARP::hwaddress_type hw;
-  const Tins::IPv4Address ip;  
+  const Tins::IPv4Address ip;
 };
 
 namespace std {

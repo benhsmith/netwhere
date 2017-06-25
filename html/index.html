@@ -6,15 +6,21 @@
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">
 	<link rel="stylesheet" href="https://cdn.rawgit.com/Chalarangelo/mini.css/v2.2.0/dist/mini-default.min.css">
-	<meta name="viewport" content="width=device-width, initial-scale=1">	
+	<style>
+	  #hosts_list > a {
+	  line-height : 1;
+	  border-bottom: 1px;
+	  }
+	</style>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
 	<div class="container">
 	  <div class="row">
-		<div class="col-md-2">
+		<div class="col-md-3">
 		  <nav id="hosts_list"></nav>
 		</div>
-		<div class="col-md-10">
+		<div class="col-md-9">
 		  <h2 id="host_name"></h2>
 		  <table id="hosts_table" paging=false class="display">
 			<thead>
@@ -25,7 +31,7 @@
 			<tbody>
 			</tbody>
 		  </table>
-    
+
 		  <table id="networks_table" paging=false class="display">
 			<thead>
 			  <tr>
@@ -40,13 +46,20 @@
 	</div>
     <script type="text/javascript">
 
-    $(document).ready( function () {
-	    var params = document.URL.slice(document.URL.indexOf('?')+1).split('=');
+      $(document).ready( function () {
+        var start = document.URL.indexOf('?');
+        if (start == -1)
+			return;
+		start++;
+	    var end = document.URL.indexOf('#');
+	    end = end > 0 ? end : document.URL.length;
+	    var params = document.URL.substr(start,end-start).split('=');
+
 	    if (params[0] == 'collector') {
 			get_flows(params[1], "#hosts_table", "#networks_table", "#host_name");
 		}
     });
 
-    </script>    
+    </script>
   </body>
 </html>

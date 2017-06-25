@@ -35,6 +35,54 @@ The collector currently always listens on 8080. That should probably be a comman
 	cmake ..
     make
 
+## REST endpoints
+A webserver provides host and flow information. Currently the webserver always listens on port 8080.
+
+There are two endoints:
+- / : returns a list of hosts
+- /IP-MAC : returns flows for a host
+
+### / endpoint
+Returns a JSON array. The array will have one entry per Netwhere host. Each host entry has the structure:
+
+    [ MAC, IP, HOSTNAME]
+
+where
+- MAC: MAC addresss of host
+- IP: IP addresss of host
+- HOSTNAME: Host name of host, if Netwhere was able to determine it. Otherwise it will be the IP address.
+
+**example**
+
+    [
+      ["192.168.0.123","aa:bb:cc:dd:ee:ff","hostname1"],
+      ["192.168.0.124","aa:bb:cc:dd:ff:ee","hostname2"]
+    ]
+
+### /? endpoint
+Returns a JSON array. Each entry in the array represents a flow. Each flow entry has the structure:
+
+    [
+	  [
+	    [ SRC_MAC, SRC_IP ],
+		[ DST_MAC, DST_IP ],
+		DST_IP_PORT,
+		IP_PROTOCOL
+	  ],
+	  BYTES_FROM_SRC,
+	  BYTES_FROM_DST
+	]
+
+where
+- SRC_MAC: MAC addresss of source
+- SRC_IP: IP addresss of source
+- DST_MAC: MAC addresss of destination
+- DST_IP: IP addresss of destination
+- DST_PORT: Port on destination
+- IP_PROTOCOL: 6 for TCP or 17 for UDP.
+- BYTES_FROM_SRC: number of bytes transferred from source to destination.
+- BYTES_FROM_DST: number of bytes transferred from destination to source.
+
 ## Dependencies
 
 https://libtins.github.io

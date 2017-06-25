@@ -13,21 +13,18 @@ public:
   FlowsCollector(const Tins::IPv4Range hosts_range) : _hosts_range(hosts_range) {}
 
   void collect(time_t current_time, const Tins::PDU &pdu);
+  void prune(int older_than);
 
-  const FlowSummaries& tcp_flows() const {
-	return _tcp_flows;
-  }
-
-  const FlowSummaries& udp_flows() const {
-	return _udp_flows;
+  const FlowSummaries& flows() const {
+	return _flows;
   }
 
   const HostSummaries& hosts() const {
 	return _hosts;
   }
+
 private:
-  FlowSummaries _tcp_flows;
-  FlowSummaries _udp_flows;
+  FlowSummaries _flows;
   HostSummaries _hosts;
   const Tins::IPv4Range _hosts_range;
 };

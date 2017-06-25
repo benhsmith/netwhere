@@ -47,7 +47,6 @@ int WebService<Functor>::on_request(void * cls,
 		    size_t * upload_data_size,
                     void ** ptr) {
   static int dummy;
-  struct MHD_Response * response;
   int ret;
 
   if (std::string("GET") != method)
@@ -63,18 +62,34 @@ int WebService<Functor>::on_request(void * cls,
     return MHD_NO; /* upload data in a GET!? */
 
   WebService<Functor>* webservice = static_cast<WebService<Functor>*>(cls);
-  const std::string& data = webservice->functor(url);
 
+  struct MHD_Response * response;
   *ptr = NULL; /* clear context pointer */
-  response = MHD_create_response_from_buffer (data.size(),
-                                              const_cast<char*>(data.c_str()),
-  					      MHD_RESPMEM_MUST_COPY);
-  MHD_add_response_header(response, "Content-Type", "application/json");
-  MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
 
-  ret = MHD_queue_response(connection,
-			   MHD_HTTP_OK,
-			   response);
+  try {
+	const std::string& data = webservice->functor(url);
+
+	response = MHD_create_response_from_buffer (data.size(),
+												const_cast<char*>(data.c_str()),
+												MHD_RESPMEM_MUST_COPY);
+	MHD_add_response_header(response, "Content-Type", "application/json");
+	MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
+
+	ret = MHD_queue_response(connection,
+							 MHD_HTTP_OK,
+							 response);
+  } catch (const std::exception& e) {
+	const std::string& data = e.what();
+	response = MHD_create_response_from_buffer (data.size(),
+												const_cast<char*>(data.c_str()),
+												MHD_RESPMEM_MUST_COPY);
+	MHD_add_response_header(response, "Content-Type", "text");
+
+	ret = MHD_queue_response(connection,
+							 MHD_HTTP_BAD_REQUEST,
+							 response);
+  }
+
   MHD_destroy_response(response);
   return ret;
 }

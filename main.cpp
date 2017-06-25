@@ -15,8 +15,6 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  //signal(SIGINT, exit);
-  
   NetWhere netwhere(argv[1], IPv4Range::from_mask(argv[2], argv[3]));
   netwhere.start();
 }
