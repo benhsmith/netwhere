@@ -26,11 +26,10 @@ function populate_host(host, hosts_table, networks_table, row) {
         url: 'http://whois.arin.net/rest/ip/' + ip,
 	    dataType: 'json',
 	}).done(function( json ) {
-	    var org_name = "";
-
+		var org_handle = "";
 	    if (json['net']['orgRef']) {
 			org_name = json['net']['orgRef']["@name"];
-			var org_handle = json['net']['orgRef']["@handle"];
+			org_handle = json['net']['orgRef']["@handle"];
 
 			if (!(org_handle in orgs)) {
 				new_row = networks_table.row.add([org_name + ' (' + org_handle + ')',0,0]);
@@ -45,8 +44,8 @@ function populate_host(host, hosts_table, networks_table, row) {
 	    }
 
 	    hosts_table.row.add([ip,
-							 json['net']['name']['$'],
-							 org_handle,
+							 json['net']['name']['$'] || "",
+							 org_handle || "",
 							 data_in,
 							 data_out
 						   ]).draw();
