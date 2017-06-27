@@ -1,14 +1,9 @@
-# netwhere
+# Netwhere
 
-This is a bare bones network monitor. The reasons for this project are:
+*Netwhere* is a simple packet monitor that serves packet monitoring data as a JSON document over a REST endpoint. The capture process is intended to be lightweight enough that it can run comfortably on typical network router hardware. An example site that displays monitoring data is provided in the 'html' directory. I do not claim to be a JavaScript programmer, the project is provided to show what *Netwhere* can do and for testing. I am hoping *Netwhere* is useful for building tools to examine networks. I started thinking about network monitoring because I wanted to see who is on my network and where they are talking to. If I install a new IofT device on my home network, it would be nice to have an easy way to see what it's doing.
 
-* I wanted a way to summarize traffic on an OpenWrt router but nothing I found quite did what I wanted.
-* After attending a C++ user's group I wanted to play around with modern C++ and needed a project.
-
-The design, currently, is a binary that does the work of collecting and summarizing flows in and out of the local network while providing the montoring results via a REST endpoint.
-A javascript frontend queries the endpoint, gathers any additional information that might be useful and provides an interactive view of the data. I want to offload as much of the work as possible onto the client so as to allow the collector to run on low-powered hardware.
-
-The frontend part of this is some cobbled together javascript to see what I can do with the data available from the backend. It's minimal.
+**netwhere** is the collector process that collects packets and summarizes flows in and out of the local network. The summarized data is availble via REST endpoints.
+A JavasSript frontend queries the endpoint, gathers any additional information that might be useful and provides an interactive view of the data. I want to offload as much of the work as possible onto the client so as to minimize the collector's hardware requirements.
 
 ## Usage
 
