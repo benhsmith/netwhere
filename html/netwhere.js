@@ -45,7 +45,7 @@ function populate_host(host, hosts_table, networks_table, row) {
 
 	    hosts_table.row.add([ip,
 							 json['net']['name']['$'] || "",
-							 org_handle || "",
+							 org_handle,
 							 data_in,
 							 data_out
 						   ]).draw();

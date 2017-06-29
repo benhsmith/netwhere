@@ -48,16 +48,25 @@
 
       $(document).ready( function () {
         var start = document.URL.indexOf('?');
-        if (start == -1)
-			return;
-		start++;
-	    var end = document.URL.indexOf('#');
-	    end = end > 0 ? end : document.URL.length;
-	    var params = document.URL.substr(start,end-start).split('=');
-
-	    if (params[0] == 'collector') {
-			get_flows(params[1], "#hosts_table", "#networks_table", "#host_name");
+		  var collector_ip;
+        if (start == -1) {
+			if (document.URL.startsWith('http://')) {
+				host = document.URL.substring(7)
+				collector_ip = host.substr(0, host.search('/')) + ":8080"
+			}
+		} else {
+			start++;
+			var end = document.URL.indexOf('#');
+			end = end > 0 ? end : document.URL.length;
+			var params = document.URL.substr(start,end-start).split('=');
+			if (params[0] == 'collector') {
+				collector_ip = params[1]
+			} else {
+				return;
+			}
 		}
+
+		get_flows(collector_ip, "#hosts_table", "#networks_table", "#host_name");
     });
 
     </script>
