@@ -22,6 +22,10 @@ Load html/index.html in a browser with a URL parameter of collector=host:ip, e.g
 
     http://localhost/netwhere/?collector=192.168.0.33:8080#
 
+or, from your local filesystem:
+
+    file:///local/path/netwhere-0.6/html/index.html?collector=localhost:8080#
+
 The collector currently always listens on 8080. That should probably be a command line parameter.
 
 ## Build
