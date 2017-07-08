@@ -27,8 +27,8 @@ The collector currently always listens on 8080. That should probably be a comman
 ## Build
 
     mkdir build
-	cd build
-	cmake ..
+    cd build
+    cmake ..
     make
 
 ## REST endpoints
@@ -60,17 +60,16 @@ The *path* portion of the URL should be a host identifier of the form: MAC-IP.
 Returns a JSON array. Each entry in the array represents a flow. Each flow entry has the structure:
 
     [
-	  [
-	    [ SRC_MAC, SRC_IP ],
-		[ DST_MAC, DST_IP ],
-		DST_IP_PORT,
-		IP_PROTOCOL
-	  ],
-	  BYTES_FROM_SRC,
-	  BYTES_FROM_DST
-	]
+      [
+        [ SRC_MAC, SRC_IP ],
+    	[ DST_MAC, DST_IP ],
+    	DST_IP_PORT,
+    	IP_PROTOCOL
+      ],
+      BYTES_FROM_SRC,
+      BYTES_FROM_DST
+    ]
 
-where
 - SRC_MAC: MAC addresss of source
 - SRC_IP: IP addresss of source
 - DST_MAC: MAC addresss of destination
