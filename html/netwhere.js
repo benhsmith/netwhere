@@ -2,6 +2,7 @@ var collector_ip;
 var hosts;
 var orgs = {};
 var hosts_table;
+var parts_table;
 var networks_table;
 var host_label;
 var mac_to_vendor = {};
@@ -11,6 +12,8 @@ function populate_host(host, hosts_table, networks_table, row) {
 	var ip;
 	var data_in;
 	var data_out;
+	var protocol;
+	var port;
 
 	if (row[0][0][1] == host.ip) {
 		ip = row[0][1][1];
@@ -21,6 +24,15 @@ function populate_host(host, hosts_table, networks_table, row) {
 		data_in = row[2];
 		data_out = row[1];
 	}
+
+	port = row[0][2];
+
+	if (row[0][3] == 6)
+		protocol = 'TCP';
+	else if (row[0][3] == 17)
+		protocol = 'UDP';
+	else
+		protocol = row[0][3];
 
 	$.ajax({
         url: 'http://whois.arin.net/rest/ip/' + ip,
@@ -43,9 +55,10 @@ function populate_host(host, hosts_table, networks_table, row) {
 			new_row.data(data).draw();
 	    }
 
-	    hosts_table.row.add([ip,
+	    hosts_table.row.add(['<a href="#">' + ip + '</a>',
 							 json['net']['name']['$'] || "",
 							 org_handle,
+							 port + '/' + protocol,
 							 data_in,
 							 data_out
 						   ]).draw();
