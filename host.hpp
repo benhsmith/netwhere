@@ -46,6 +46,14 @@ public:
   const Host& host() const { return _host; }
   const std::vector<const FlowSummary*>& flows() const { return _flows; }
 
+  void remove(const Flow &flow) {
+	for (auto flow_summary = _flows.begin(); flow_summary != _flows.end(); flow_summary++) {
+	  if ((*flow_summary)->flow() == flow) {
+		_flows.erase(flow_summary);
+		break;
+	  }
+	}
+  }
 private:
   const Host _host;
   std::vector<const FlowSummary*> _flows;

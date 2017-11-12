@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE( prune ) {
   {
 	TCP tcp(80, 10000);
 	tcp.set_flag(TCP::SYN, 1);
-	IP ip("1.2.3.4", "192.168.0.10");
+	IP ip("192.168.0.20", "192.168.0.10");
 	ip.protocol(Constants::IP::PROTO_TCP);
 	EthernetII eth = EthernetII("11:22:33:44:55:66", "AA:BB:CC:DD:EE:FF")
 	  / ip
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE( prune ) {
 	tcp.set_flag(TCP::SYN, 1);
 	IP ip("1.2.3.5", "192.168.0.10");
 	ip.protocol(Constants::IP::PROTO_TCP);
-	EthernetII eth = EthernetII("11:22:33:44:55:66", "AA:BB:CC:DD:EE:FF")
+	EthernetII eth = EthernetII("22:33:44:55:66:77", "AA:BB:CC:DD:EE:FF")
 	  / ip
 	  / tcp;
 
@@ -143,5 +143,14 @@ BOOST_AUTO_TEST_CASE( prune ) {
   auto summary_it = value_iterator(collector.flows().begin());
   BOOST_REQUIRE(summary_it != collector.flows().end());
   BOOST_CHECK_EQUAL((*summary_it)->flow().dst_ip, "1.2.3.5");
-}
 
+  auto host_flow_it = collector.hosts().find(Host("AA:BB:CC:DD:EE:FF", "192.168.0.10"));
+  BOOST_REQUIRE(host_flow_it != collector.hosts().end());
+
+  BOOST_CHECK_EQUAL(host_flow_it->second->flows().size(), 1);
+
+  host_flow_it = collector.hosts().find(Host("11:22:33:44:55:66", "192.168.0.20"));
+  BOOST_REQUIRE(host_flow_it != collector.hosts().end());
+
+  BOOST_CHECK_EQUAL(host_flow_it->second->flows().size(), 0);
+}

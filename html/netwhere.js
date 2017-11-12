@@ -8,6 +8,19 @@ var host_label;
 var mac_to_vendor = {};
 var hosts_info = {};
 
+function format_bytes(a,b) {
+	if (0==a) return"0";
+	var c=1024,d=b||2,e=["Bytes","KB","MB","GB","TB","PB","EB","ZB","YB"],f=Math.floor(Math.log(a)/Math.log(c));
+	return parseFloat((a/Math.pow(c,f)).toFixed(d))+" "+e[f]
+}
+
+function render_size(data, type, row, meta) {
+	if (type == "display")
+		return format_bytes(data) + " - " + data;
+	else
+		return data;
+}
+
 function populate_host(host, hosts_table, networks_table, row) {
 	var ip;
 	var data_in;
@@ -55,12 +68,12 @@ function populate_host(host, hosts_table, networks_table, row) {
 			new_row.data(data).draw();
 	    }
 
-	    hosts_table.row.add(['<a href="#">' + ip + '</a>',
+	    hosts_table.row.add([ip,
 							 json['net']['name']['$'] || "",
 							 org_handle,
 							 port + '/' + protocol,
 							 data_in,
-							 data_out
+							 data_out,
 						   ]).draw();
     });
 }
@@ -94,8 +107,23 @@ function fill_tables(elem, host_key) {
 
 function get_flows(ip, hosts_table_id, networks_table_id, host_label_id) {
 	collector_ip = ip;
-	hosts_table = $(hosts_table_id).DataTable({ searching: true });
-	networks_table = $(networks_table_id).DataTable({ searching: false });
+	hosts_table = $(hosts_table_id).DataTable(
+		{ searching: true, columnDefs: [
+		  {
+			  targets: [4, 5],
+			  render: render_size,
+		  }
+		]}
+	);
+	networks_table = $(networks_table_id).DataTable(
+		{ searching: false,  columnDefs: [
+		  {
+			  targets: [1, 2],
+			  render: render_size,
+		  }
+		]
+		}
+	);
 	host_label = $(host_label_id);
 
 	$.ajax({

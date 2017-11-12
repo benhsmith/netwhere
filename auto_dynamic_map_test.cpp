@@ -15,7 +15,7 @@ public:
 
   static void reset() { instances = 0; }
   static int get_instances() { return instances; }
-  
+
 private:
   static int instances;
   int _key;
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE( unique_ptr_create ) {
  	auto& value = map[1] = unique_ptr<TestValue>(new TestValue(1));
 
 	map.insert( make_pair(2, move(unique_ptr<TestValue>(new TestValue(2)))) );
-	
+
 	BOOST_CHECK_EQUAL(value->key(), 1);
     BOOST_CHECK_EQUAL(TestValue::get_instances(), 2);
   }
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE( unique_ptr_create ) {
 
 BOOST_AUTO_TEST_CASE( auto_dynamic_map_create ) {
   AutoDynamicMap<int, TestValue> map;
-  
+
   TestValue& value1 = map[1];
   TestValue& value2 = map[1];
 

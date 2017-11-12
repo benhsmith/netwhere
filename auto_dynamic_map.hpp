@@ -9,7 +9,6 @@ public:
   ValueIterator(const Iterator& it) : Iterator(it) {}
 
   const typename Iterator::value_type::second_type& operator * () { return (Iterator::operator *()).second; }
-  //  typename Iterator::value_type::second_type& operator * () const { return (*(*this)).second; }
 };
 
 template <typename Iterator>

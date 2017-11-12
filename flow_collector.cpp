@@ -97,7 +97,20 @@ void FlowsCollector::prune(int older_than) {
 	}
   }
 
+  cout << "Pruning " << to_remove.size() << " flows" << endl;
+
   for (auto && flow : to_remove) {
+
+	auto host_flow = _hosts.find(Host(flow.src_hw, flow.src_ip));
+	if (host_flow != _hosts.end()) {
+	  host_flow->second->remove(flow);
+	}
+
+	host_flow = _hosts.find(Host(flow.dst_hw, flow.dst_ip));
+	if (host_flow != _hosts.end()) {
+	  host_flow->second->remove(flow);
+	}
+
 	_flows.erase(flow);
   }
 }

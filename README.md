@@ -14,7 +14,9 @@ To start the collector:
 
     netwhere interface ip mask
 
-The IP and mask tell the netwhere collector how to identify traffic that it should track as a "host". When you query the endpoint you will get a JSON object of hosts where each host constains a list of connections and the number of bytes that went to and from that connection. netwhere includes all addresses in the ip/mask range as "hosts".
+The IP and mask tell the netwhere collector how to identify traffic that it should track as a "host". The _/_ endpoint returns a JSON array of hosts where each host constains a list of connections and the number of bytes that went to and from that connection. **netwhere** includes all addresses in this ip/mask range as "hosts".
+
+
 
 For example:
 
@@ -94,7 +96,5 @@ https://www.gnu.org/software/libmicrohttpd
 http://www.boost.org
 
 https://code.jquery.com/
-
-
 
 http://minicss.org/

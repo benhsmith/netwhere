@@ -62,7 +62,7 @@ string NetWhere::handle_request(const string& url) {
 
   size_t end = url.find_last_of('/');
 
-  if (end == len-1)
+  if (end == len-1 || end == string::npos)
     return hosts();
   else {
 	size_t start;
