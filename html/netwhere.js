@@ -16,7 +16,7 @@ function format_bytes(a,b) {
 
 function render_size(data, type, row, meta) {
 	if (type == "display")
-		return format_bytes(data) + " - " + data;
+		return format_bytes(data);
 	else
 		return data;
 }
