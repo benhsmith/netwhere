@@ -92,8 +92,9 @@ string NetWhere::hosts() {
     }
 
 	const HostFlows& flows = (*it).second;
-    out << format("[\"%1%\",\"%2%\",\"%3%\"]") % flows.host().ip % flows.host().hw
-	  % get_hostname(flows.host());
+    out << format("[\"%1%\",\"%2%\",\"%3%\",\"%4%\",\"%5%\"]") % flows.host().ip % flows.host().hw
+	  % get_hostname(flows.host())
+	  % flows.bytes_in() % flows.bytes_out();
   }
 
   out << "]" << endl;
@@ -125,7 +126,7 @@ string NetWhere::host_flows(const string& host_key) {
 	out << format("[[[\"%1%\", \"%2%\"], [\"%3%\", \"%4%\"], %5%, %6%], %7%, %8% ]")
 	  % summary->flow().src_hw % summary->flow().src_ip
 	  % summary->flow().dst_hw % summary->flow().dst_ip % summary->flow().dst_port % (int)summary->flow().ip_protocol
-	  % summary->bytes_src() % summary->bytes_dst();
+	  % summary->bytes_to_src() % summary->bytes_to_dst();
   }
 
   out << "]" << endl;

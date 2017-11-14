@@ -13,6 +13,8 @@ public:
   FlowsCollector(const Tins::IPv4Range hosts_range) : _hosts_range(hosts_range) {}
 
   void collect(time_t current_time, const Tins::PDU &pdu);
+  void collect_tcp(time_t current_time, const Tins::EthernetII& eth, const Tins::IP& ip, const Tins::TCP* udp);
+  void collect_udp(time_t current_time, const Tins::EthernetII& eth, const Tins::IP& ip, const Tins::UDP* udp);
   void prune(int older_than);
 
   const FlowSummaries& flows() const {

@@ -8,6 +8,12 @@
 
 #include "pointer_iterator.hpp"
 
+/*
+ * A Flow represents communication between a source Host and a destination Host and port.
+ * We retain the destination port since it often indicates the service being requested but
+ * ignore the source port. Ignoring the source port makes it easier to aggregate the same
+ * type of communication into a single Flow.
+ */
 struct Flow {
   Flow(const Tins::EthernetII::address_type& src_hw,
 	   const Tins::IPv4Address& src_ip,
@@ -51,8 +57,8 @@ public:
   }
 
   const Flow& flow() const { return _flow; }
-  size_t bytes_src() const { return _bytes_to_src; }
-  size_t bytes_dst() const { return _bytes_to_dst; }
+  size_t bytes_to_src() const { return _bytes_to_src; }
+  size_t bytes_to_dst() const { return _bytes_to_dst; }
   time_t modified_at() const { return _modified_at; }
 
 private:

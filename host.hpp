@@ -37,16 +37,13 @@ namespace std {
 
 class HostFlows {
 public:
-  HostFlows(const Host& host) : _host(host) {}
+  HostFlows(const Host& host) : _host(host), _bytes_in(0), _bytes_out(0) {}
 
   void add_flow(const FlowSummary* summary) {
 	_flows.push_back(summary);
   }
 
-  const Host& host() const { return _host; }
-  const std::vector<const FlowSummary*>& flows() const { return _flows; }
-
-  void remove(const Flow &flow) {
+  void remove_flow(const Flow& flow) {
 	for (auto flow_summary = _flows.begin(); flow_summary != _flows.end(); flow_summary++) {
 	  if ((*flow_summary)->flow() == flow) {
 		_flows.erase(flow_summary);
@@ -54,9 +51,25 @@ public:
 	  }
 	}
   }
+
+  void update_host_stats(const FlowSummary& summary) {
+	if (summary.flow().src_ip == _host.ip && summary.flow().src_hw == _host.hw)
+	  _bytes_in += summary.bytes_to_src();
+	else
+	  _bytes_out += summary.bytes_to_dst();
+  }
+
+  const Host& host() const { return _host; }
+  const std::vector<const FlowSummary*>& flows() const { return _flows; }
+  size_t bytes_in() const { return _bytes_in; }
+  size_t bytes_out() const { return _bytes_out; }
+
 private:
   const Host _host;
   std::vector<const FlowSummary*> _flows;
+
+  size_t _bytes_in;
+  size_t _bytes_out;
 };
 
 #endif

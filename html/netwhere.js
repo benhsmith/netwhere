@@ -141,7 +141,9 @@ function get_flows(ip, hosts_table_id, networks_table_id, host_label_id) {
 			hosts_info[hosts[i][1] + '-' + hosts[i][0]] = {
 				mac : hosts[i][1],
 				ip : hosts[i][0],
-				hostname : hosts[i][2]
+				hostname : hosts[i][2],
+				bytes_in : hosts[i][3],
+				bytes_out : hosts[i][4],
 			}
 		}
 
@@ -150,6 +152,7 @@ function get_flows(ip, hosts_table_id, networks_table_id, host_label_id) {
 			if (hosts_info[key].hostname != hosts_info[key].ip) {
 				html += ' - ' + hosts_info[key].hostname;
 			}
+			html += '&nbsp;&nbsp;[' + hosts_info[key].bytes_in + ', ' + hosts_info[key].bytes_out + ']';
 
 			hosts_info[key].href = $( "<a/>", {
 				href: "#",

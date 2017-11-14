@@ -57,8 +57,8 @@ BOOST_AUTO_TEST_CASE( tcp_flow ) {
   auto summary_it = value_iterator(collector.flows().find(http_flow));
   BOOST_REQUIRE(summary_it != collector.flows().end());
   BOOST_CHECK_EQUAL(http_flow.src_hw, (*summary_it)->flow().src_hw);
-  BOOST_CHECK_EQUAL((*summary_it)->bytes_dst(), 5);
-  BOOST_CHECK_EQUAL((*summary_it)->bytes_src(), 2);
+  BOOST_CHECK_EQUAL((*summary_it)->bytes_to_dst(), 5);
+  BOOST_CHECK_EQUAL((*summary_it)->bytes_to_src(), 2);
 
   Flow ssh_flow("A1:B2:C3:D4:E5:F6", "1.2.3.4", "AA:BB:CC:DD:EE:FF", "192.168.0.10", 22, Constants::IP::PROTO_TCP);
 
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE( tcp_flow ) {
   BOOST_REQUIRE(summary_it != collector.flows().end());
   BOOST_CHECK_EQUAL(ssh_flow.src_hw, (*summary_it)->flow().src_hw);
   BOOST_CHECK_EQUAL(ssh_flow.dst_hw, (*summary_it)->flow().dst_hw);
-  BOOST_CHECK_EQUAL((*summary_it)->bytes_dst(), 2);
+  BOOST_CHECK_EQUAL((*summary_it)->bytes_to_dst(), 2);
 
   auto host_it = value_iterator(collector.hosts().find(Host("AA:BB:CC:DD:EE:FF", "192.168.0.10")));
   BOOST_REQUIRE(host_it != collector.hosts().end());
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE( udp_flow ) {
 
   BOOST_CHECK_EQUAL((*it)->flow().src_ip, "192.168.0.10");
   BOOST_CHECK_EQUAL((*it)->flow().dst_ip, "1.2.3.4");
-  BOOST_CHECK_EQUAL((*it)->bytes_dst(), 9);
+  BOOST_CHECK_EQUAL((*it)->bytes_to_dst(), 9);
 }
 
 BOOST_AUTO_TEST_CASE( prune ) {
