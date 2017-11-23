@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2017, Ben Smith
+ * All rights reserved.
+ *
+ */
+
 #include <sys/socket.h>
 #include <netdb.h>
 #include <time.h>
@@ -86,15 +92,14 @@ string NetWhere::hosts() {
 
   out << "[";
 
-  for (auto it = _collector.hosts().begin(); it != _collector.hosts().end(); ++it) {
-    if (it != _collector.hosts().begin()) {
+  for (auto hflows = _collector.hosts().begin(); hflows != _collector.hosts().end(); ++hflows) {
+    if (hflows != _collector.hosts().begin()) {
       out << ",";
     }
 
-	const HostFlows& flows = (*it).second;
-    out << format("[\"%1%\",\"%2%\",\"%3%\",\"%4%\",\"%5%\"]") % flows.host().ip % flows.host().hw
-	  % get_hostname(flows.host())
-	  % flows.bytes_in() % flows.bytes_out();
+    out << format("[\"%1%\",\"%2%\",\"%3%\",\"%4%\",\"%5%\"]") % hflows->host().ip % hflows->host().hw
+	  % get_hostname(hflows->host())
+	  % hflows->bytes_in() % hflows->bytes_out();
   }
 
   out << "]" << endl;
@@ -105,23 +110,23 @@ string NetWhere::hosts() {
 string NetWhere::host_flows(const string& host_key) {
   size_t dashpos = host_key.find('-');
 
-  auto hostflows = _collector.hosts().find(Host(host_key.substr(0, dashpos), host_key.substr(dashpos + 1)));
+  auto hflows = _collector.hosts().find(Host(host_key.substr(0, dashpos), host_key.substr(dashpos + 1)));
 
-  if (hostflows == _collector.hosts().end()) {
+  if (hflows == _collector.hosts().end()) {
 	throw runtime_error("Unknown host" + host_key);
   }
 
   ostringstream out;
   out << "[";
 
-  auto flows = hostflows->second->flows();
+  auto flows = hflows->flows();
 
   for (auto flow_it = flows.begin(); flow_it != flows.end(); ++flow_it) {
 	if (flow_it != flows.begin()) {
 	  out << ", ";
 	}
 
-	const FlowSummary* summary = (*flow_it);
+	const FlowCounter* summary = (*flow_it);
 
 	out << format("[[[\"%1%\", \"%2%\"], [\"%3%\", \"%4%\"], %5%, %6%], %7%, %8% ]")
 	  % summary->flow().src_hw % summary->flow().src_ip

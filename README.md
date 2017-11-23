@@ -1,12 +1,12 @@
 # Netwhere
 
-*Netwhere* is a simple packet monitor that serves packet monitoring data as a JSON document over a REST endpoint. The capture process is intended to be lightweight enough that it can run comfortably on typical network router hardware. An example site that displays monitoring data is provided in the 'html' directory. I do not claim to be a JavaScript programmer, the project is provided to show what *Netwhere* can do and for testing. I am hoping *Netwhere* is useful for building tools to examine networks.
+*Netwhere* is a packet monitor that serves packet monitoring data as a JSON document over a REST endpoint. The capture process is intended to be lightweight enough that it can run comfortably on a home router. An example site that displays monitoring data is provided in the 'html' directory. I do not claim to be a JavaScript programmer, the project is provided to show what *Netwhere* can do and for testing. I am hoping *Netwhere* is useful for building tools to examine networks.
 I started thinking about network monitoring because I wanted to see who is on my network and where they are talking to. If I install a new IoT device on my home network, it would be nice to have an easy way to see what it's doing.
 
 **netwhere** is the collector process that collects packets and summarizes flows in and out of the local network. The summarized data is availble via REST endpoints.
 A JavasSript frontend queries the endpoint, gathers any additional information that might be useful and provides an interactive view of the data. I want to offload as much of the work as possible onto the client so as to minimize the collector's hardware requirements.
 
-*Netwhere* is now available as an OpenWrt package.
+*Netwhere* is available as an OpenWrt package.
 
 ## Usage
 
@@ -38,6 +38,8 @@ The collector currently always listens on 8080. That should probably be a comman
     cd build
     cmake ..
     make
+
+*for debug build: cmake -DCMAKE_BUILD_TYPE=Debug ..*
 
 ## REST endpoints
 A webserver provides host and flow information. Currently the webserver always listens on port 8080.

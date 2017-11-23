@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2017, Ben Smith
+ * All rights reserved.
+ *
+ */
+
 #ifndef __WEBSERVICE_H__
 #define __WEBSERVICE_H__
 

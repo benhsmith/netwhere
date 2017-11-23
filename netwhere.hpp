@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2017, Ben Smith
+ * All rights reserved.
+ *
+ */
+
 #ifndef __NETWHERE_H__
 #define __NETWHERE_H__
 

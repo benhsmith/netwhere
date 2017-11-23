@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2017, Ben Smith
+ * All rights reserved.
+ *
+ */
+
 #include <iostream>
 #include <tins/tins.h>
 

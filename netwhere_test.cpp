@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE( handle_request ) {
   netwhere.handle_packet(eth);
 
   BOOST_CHECK_EQUAL(netwhere.handle_request(""), "[" \
-    "[\"192.168.0.123\",\"aa:bb:cc:dd:ee:ff\",\"192.168.0.123\"]" \
+    "[\"192.168.0.123\",\"aa:bb:cc:dd:ee:ff\",\"192.168.0.123\",\"0\",\"0\"]" \
     "]\n"
   );
 
@@ -71,8 +71,8 @@ BOOST_AUTO_TEST_CASE( handle_request ) {
   netwhere.handle_packet(eth);
 
   BOOST_CHECK_EQUAL(netwhere.handle_request(""), "[" \
-     "[\"192.168.0.124\",\"ba:ba:cc:dd:ee:ff\",\"192.168.0.124\"]," \
-     "[\"192.168.0.123\",\"aa:bb:cc:dd:ee:ff\",\"192.168.0.123\"]" \
+     "[\"192.168.0.124\",\"ba:ba:cc:dd:ee:ff\",\"192.168.0.124\",\"0\",\"0\"]," \
+     "[\"192.168.0.123\",\"aa:bb:cc:dd:ee:ff\",\"192.168.0.123\",\"0\",\"0\"]" \
 	"]\n"
   );
 }
