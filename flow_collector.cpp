@@ -5,11 +5,14 @@
  */
 
 #include <vector>
+#include <boost/format.hpp>
 
 #include "flow_collector.hpp"
+#include "logger.hpp"
 
 using namespace std;
 using namespace Tins;
+using namespace boost;
 
 void FlowsCollector::collect(time_t current_time, const PDU &pdu) {
   const EthernetII& eth = pdu.rfind_pdu<EthernetII>();
@@ -18,7 +21,7 @@ void FlowsCollector::collect(time_t current_time, const PDU &pdu) {
   const UDP* udp = pdu.find_pdu<UDP>();
 
   if (!_hosts_range.contains(ip.src_addr()) && !_hosts_range.contains(ip.dst_addr())) {
-	cout << "This shouldn't happen, neither source nor destination is in the specified host range:  " << ip.src_addr() << " -> " << ip.dst_addr() << ":" << tcp->dport() << endl;
+	LOG(format("Neither source nor destination is in the specified host range: %1% -> %2%\n") % ip.src_addr() % ip.dst_addr());
 	return;
   }
 
@@ -26,6 +29,8 @@ void FlowsCollector::collect(time_t current_time, const PDU &pdu) {
 	collect_tcp(current_time, eth, ip, tcp);
   } else if(udp) {
 	collect_udp(current_time, eth, ip, udp);
+  } else {
+	LOG(format("Did not find a TCP or UDP PDU for:  %1% -> %2%") % ip.src_addr() % ip.dst_addr());
   }
 }
 
@@ -129,7 +134,7 @@ void FlowsCollector::prune(int older_than) {
 	}
   }
 
-  cout << "Pruning " << to_remove.size() << " flows" << endl;
+  LOG(format("Pruning %1% flows") % to_remove.size());
 
   for (auto && flow : to_remove) {
 

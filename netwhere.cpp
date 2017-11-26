@@ -6,7 +6,6 @@
 
 #include <sys/socket.h>
 #include <netdb.h>
-#include <time.h>
 #include <unistd.h>
 
 #include <functional>
@@ -15,21 +14,12 @@
 #include <tuple>
 #include <unordered_map>
 
-#include <boost/format.hpp>
-
 #include "netwhere.hpp"
 
 using namespace std;
 using namespace std::placeholders;
 using namespace boost;
 using namespace Tins;
-
-string now_string() {
-  char buf[256];
-  time_t now = time(nullptr);
-  strftime(buf, sizeof(buf), "[%F %T] ", localtime(&now));
-  return string(buf);
-}
 
 void NetWhere::start() {
   auto functor = bind(&NetWhere::handle_request,this,_1);
@@ -82,7 +72,7 @@ string NetWhere::handle_request(const string& url) {
 	return host_flows(url.substr(start, end - start));
   }
 
-  cout << format("Invalid URL : %1%\n") % url;
+  LOG(format("Invalid URL : %1%") % url);
 
   return "";
 }
@@ -137,14 +127,6 @@ string NetWhere::host_flows(const string& host_key) {
   out << "]" << endl;
 
   return out.str();
-}
-
-void NetWhere::print_stats() {
-  string now = now_string();
-
-  cout << endl;
-  cout << format("%1% %2% hosts\n") % now % _collector.hosts().size();
-  cout << format("%1% %2% flows\n") % now % _collector.flows().size();
 }
 
 string NetWhere::get_hostname(const Host& host) {

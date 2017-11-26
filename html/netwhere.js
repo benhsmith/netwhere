@@ -142,26 +142,33 @@ function get_flows(ip, hosts_table_id, networks_table_id, host_label_id) {
 				mac : hosts[i][1],
 				ip : hosts[i][0],
 				hostname : hosts[i][2],
-				bytes_in : hosts[i][3],
-				bytes_out : hosts[i][4],
+				bytes_in : format_bytes(hosts[i][3]),
+				bytes_out : format_bytes(hosts[i][4]),
 			}
 		}
 
 		for (key in hosts_info) {
-			var html = hosts_info[key].ip;
+			html = "<div class='row'><div class='col-md'>"
+			html += hosts_info[key].ip;
 			if (hosts_info[key].hostname != hosts_info[key].ip) {
 				html += ' - ' + hosts_info[key].hostname;
 			}
-			html += '&nbsp;&nbsp;[' + hosts_info[key].bytes_in + ', ' + hosts_info[key].bytes_out + ']';
+			html += "</div></div>";
+			html += "<div class='row'><div class='col-md'>";
+			html +=	hosts_info[key].bytes_in + ', ' + hosts_info[key].bytes_out;
+			html += '</div></div>';
+			//html += "</div>";
 
-			hosts_info[key].href = $( "<a/>", {
-				href: "#",
+			href = $( "<button/>", {
+				class: "host",
 				html: html,
 				onclick: 'fill_tables(this, "' + key + '")'
 			});
+			hosts_info[key].html = href;
 
-			$('#hosts_list').append(
-				hosts_info[key].href
+			hl = $('#hosts_list');
+			hl.append(
+				hosts_info[key].html
 			);
 		}
 
@@ -173,8 +180,10 @@ function get_flows(ip, hosts_table_id, networks_table_id, host_label_id) {
 				mac_to_vendor[this.mac_prefix] = vendor;
 				for (key in hosts_info) {
 					host = hosts_info[key];
-					if (host.mac.slice(0,8) == this.mac_prefix)
-						host.href.html(host.href.html() + '<div style="text-align:right">[' + vendor + ']</div>');
+					if (host.mac.slice(0,8) == this.mac_prefix) {
+						row = host.html.children()[1];
+						$(row).append("<div class='col-md'>[" + vendor + "]</div>");
+					}
 				}
 			}).fail(function( xhr, status, errorThrown ) {
 				console.log(status)

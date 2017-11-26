@@ -14,10 +14,9 @@ using namespace Tins;
 
 #include <unistd.h>
 
-
 int main(int argc, char **argv) {
   if (argc != 4) {
-    cout << "usage: " << argv[0] << " interface ip netmask" << endl;
+    cerr << "usage: " << argv[0] << " interface ip netmask" << endl;
     return 1;
   }
 

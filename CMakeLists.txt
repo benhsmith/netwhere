@@ -7,6 +7,10 @@ option(BUILD_TESTS
 option(BUILD_DOC
   "Build documentation" ON)
 
+if (ENABLE_LOGGING)
+  add_definitions(-DENABLE_LOGGING)
+endif (ENABLE_LOGGING)
+
 add_executable(netwhere main.cpp netwhere.cpp flow_collector.cpp)
 target_link_libraries(netwhere PRIVATE tins microhttpd)
 target_compile_features(netwhere PUBLIC cxx_auto_type cxx_generalized_initializers)
@@ -24,7 +28,6 @@ if (BUILD_TESTS)
   target_compile_features(object_set_test PUBLIC cxx_auto_type cxx_generalized_initializers)
   target_link_libraries(object_set_test PRIVATE boost_unit_test_framework)
   add_test(object_set_test ./object_set_test)
-
 
   add_executable(flow_test flow_test.cpp flow_collector.cpp)
   target_compile_features(flow_test PUBLIC cxx_auto_type cxx_generalized_initializers)

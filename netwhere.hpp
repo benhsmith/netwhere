@@ -8,10 +8,12 @@
 #define __NETWHERE_H__
 
 #include <tins/tins.h>
+#include <boost/format.hpp>
 
 #include "flow_collector.hpp"
 #include "reader_writer_exclusion.hpp"
 #include "webservice.hpp"
+#include "logger.hpp"
 
 class NetWhere {
 public:
@@ -37,7 +39,7 @@ private:
 
   std::string hosts();
   std::string host_flows(const std::string& host_key);
-  void print_stats();
+  void print_stats() { LOG(boost::format("%1% hosts, %2% flows") % _collector.hosts().size() % _collector.flows().size()); }
   std::string get_hostname(const Host& host);
 };
 
