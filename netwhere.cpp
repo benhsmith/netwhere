@@ -118,7 +118,7 @@ string NetWhere::host_flows(const string& host_key) {
 
 	const FlowCounter* summary = (*flow_it);
 
-	out << format("[[[\"%1%\", \"%2%\"], [\"%3%\", \"%4%\"], %5%, %6%], %7%, %8% ]")
+	out << format("[[[\"%1%\", \"%2%\"], [\"%3%\", \"%4%\"], %5%, %6%], %7%, %8%]")
 	  % summary->flow().src_hw % summary->flow().src_ip
 	  % summary->flow().dst_hw % summary->flow().dst_ip % summary->flow().dst_port % (int)summary->flow().ip_protocol
 	  % summary->bytes_to_src() % summary->bytes_to_dst();

@@ -121,8 +121,10 @@ public:
 
   void erase(const Key& key) {
 	auto it = _map.find(key);
-	delete it->second;
-	_map.erase(it);
+	if (it != _map.end()) {
+	  delete it->second;
+	  _map.erase(it);
+	}
   }
 
   size_t size() const {

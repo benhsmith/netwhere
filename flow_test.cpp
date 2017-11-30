@@ -171,3 +171,77 @@ BOOST_AUTO_TEST_CASE( prune ) {
   BOOST_CHECK_EQUAL(host_flow_it->flows().size(), 0);
 }
 
+BOOST_AUTO_TEST_CASE( prune_with_repeats ) {
+  FlowsCollector collector(IPv4Range::from_mask("192.168.0.0", "255.255.255.0"));
+
+  {
+	TCP tcp(80, 10000);
+	tcp.set_flag(TCP::SYN, 1);
+	IP ip("192.168.0.20", "192.168.0.10");
+	ip.protocol(Constants::IP::PROTO_TCP);
+	EthernetII eth = EthernetII("11:22:33:44:55:66", "AA:BB:CC:DD:EE:FF")
+	  / ip
+	  / tcp;
+
+	collector.collect(1000, eth);
+  }
+
+  {
+	TCP tcp(80, 10000);
+	IP ip("192.168.0.20", "192.168.0.10");
+	ip.protocol(Constants::IP::PROTO_TCP);
+	EthernetII eth = EthernetII("11:22:33:44:55:66", "AA:BB:CC:DD:EE:FF")
+	  / ip
+	  / tcp;
+
+	collector.collect(1001, eth);
+  }
+
+  {
+	UDP udp(80, 10000);
+	IP ip("192.168.0.10", "192.168.0.20");
+	ip.protocol(Constants::IP::PROTO_UDP);
+	EthernetII eth = EthernetII("AA:BB:CC:DD:EE:FF", "11:22:33:44:55:66")
+	  / ip
+	  / udp;
+
+	collector.collect(1001, eth);
+  }
+
+  {
+	TCP tcp(80, 10000);
+	tcp.set_flag(TCP::SYN, 1);
+	IP ip("1.2.3.5", "192.168.0.10");
+	ip.protocol(Constants::IP::PROTO_TCP);
+	EthernetII eth = EthernetII("22:33:44:55:66:77", "AA:BB:CC:DD:EE:FF")
+	  / ip
+	  / tcp;
+
+	collector.collect(2000, eth);
+  }
+
+  auto host_flow_it = collector.hosts().find(Host("AA:BB:CC:DD:EE:FF", "192.168.0.10"));
+  BOOST_REQUIRE(host_flow_it != collector.hosts().end());
+
+  BOOST_CHECK_EQUAL(host_flow_it->flows().size(), 3);
+
+  BOOST_CHECK_EQUAL(collector.flows().size(), 3);
+
+  collector.prune(500);
+
+  BOOST_CHECK_EQUAL(collector.flows().size(), 3);
+
+  collector.prune(1500);
+
+  BOOST_CHECK_EQUAL(collector.flows().size(), 1);
+  BOOST_CHECK_EQUAL(host_flow_it->flows().size(), 1);
+
+  auto summary_it = collector.flows().begin();
+  BOOST_REQUIRE(summary_it != collector.flows().end());
+  BOOST_CHECK_EQUAL((*summary_it)->flow().dst_ip, "1.2.3.5");
+
+  host_flow_it = collector.hosts().find(Host("11:22:33:44:55:66", "192.168.0.20"));
+  BOOST_REQUIRE(host_flow_it != collector.hosts().end());
+
+  BOOST_CHECK_EQUAL(host_flow_it->flows().size(), 0);
+}

@@ -34,7 +34,8 @@ struct Flow {
 	  && src_ip   == other.src_ip
 	  && dst_hw   == other.dst_hw
 	  && dst_ip   == other.dst_ip
-	  && dst_port == other.dst_port;
+	  && dst_port == other.dst_port
+	  && ip_protocol == other.ip_protocol;
   }
 
   const Tins::EthernetII::address_type src_hw;
@@ -73,7 +74,6 @@ namespace std {
 class FlowCounter {
 public:
   FlowCounter(const Flow& flow) : _flow(flow), _bytes_to_src(0), _bytes_to_dst(0), _modified_at(0) {}
-  FlowCounter(const Flow& flow, time_t current_time, size_t bytes) : _flow(flow),  _bytes_to_src(0), _bytes_to_dst(0), _modified_at(current_time) {}
 
   void incr_src(time_t current_time, size_t bytes) {
 	_bytes_to_src += bytes;

@@ -151,4 +151,3 @@ void FlowsCollector::prune(int older_than) {
 	_flows.erase(flow);
   }
 }
-

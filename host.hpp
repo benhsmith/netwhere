@@ -65,9 +65,9 @@ public:
 
   void update_host_stats(const Flow& flow, size_t bytes) {
 	if (flow.src_ip == _host.ip && flow.src_hw == _host.hw)
-	  _bytes_in += bytes;
-	else
 	  _bytes_out += bytes;
+	else
+	  _bytes_in += bytes;
   }
 
   const Host& host() const { return _host; }

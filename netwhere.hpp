@@ -29,7 +29,7 @@ public:
 private:
   const int _print_stats_interval = 60;
   const int _prune_interval = 60*60;
-  const int _prune_older_than = 60*60*24;
+  const int _prune_older_than = 60*60*2;
 
   FlowsCollector _collector;
   ReaderWriterExclusion _rw_exclusion;

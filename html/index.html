@@ -9,9 +9,15 @@
 	<style>
 	  .host {
 	    width:100%;
-   	    border-bottom: 1px solid;
 	    margin:0px;
 	    text-align:left;
+	    cursor:pointer;
+	  }
+	  .host:hover {
+	     background: #d0d0d0;
+	  }
+	  #hosts_list > .row {
+         border-bottom: 1px solid;
 	  }
 	</style>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,7 +25,12 @@
   <body>
 	<div class="container">
 	  <div class="row">
-		<div class="col-md-3" id="hosts_list">
+		<div class="col-md" id="hosts_list">
+			<div class="row">
+			  <div class="col-md-5"><h3>Host</h3></div>
+			  <div class="col-md"><h3>In</h3></div>
+			  <div class="col-md"><h3>Out</h3></div>
+			</div>
 		</div>
 		<div class="col-md-9">
 		  <h2 id="host_name"></h2>

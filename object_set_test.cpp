@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE( auto_dynamic_map_insert ) {
   BOOST_CHECK(value1.first == value2.first);
 }
 
-BOOST_AUTO_TEST_CASE( auto_dynamic_map_deletes ) {
+BOOST_AUTO_TEST_CASE( auto_dynamic_map_destructor ) {
   TestObject::reset();
   {
     ObjectSet<int, TestObject> map;
@@ -63,4 +63,24 @@ BOOST_AUTO_TEST_CASE( auto_dynamic_map_deletes ) {
   }
 
   BOOST_CHECK_EQUAL(TestObject::get_instances(), 0);
+}
+
+BOOST_AUTO_TEST_CASE( auto_dynamic_map_erase ) {
+  TestObject::reset();
+
+  ObjectSet<int, TestObject> map;
+
+  map.insert(1);
+  map.insert(2);
+  map.insert(3);
+
+  BOOST_CHECK_EQUAL(TestObject::get_instances(), 3);
+
+  map.erase(1);
+
+  BOOST_CHECK_EQUAL(TestObject::get_instances(), 2);
+
+  map.erase(3);
+
+  BOOST_CHECK_EQUAL(TestObject::get_instances(), 1);
 }

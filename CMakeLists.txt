@@ -7,15 +7,6 @@ option(BUILD_TESTS
 option(BUILD_DOC
   "Build documentation" ON)
 
-if (ENABLE_LOGGING)
-  add_definitions(-DENABLE_LOGGING)
-endif (ENABLE_LOGGING)
-
-add_executable(netwhere main.cpp netwhere.cpp flow_collector.cpp)
-target_link_libraries(netwhere PRIVATE tins microhttpd)
-target_compile_features(netwhere PUBLIC cxx_auto_type cxx_generalized_initializers)
-install(TARGETS netwhere DESTINATION bin)
-
 if (BUILD_TESTS)
   enable_testing()
 
@@ -34,6 +25,15 @@ if (BUILD_TESTS)
   target_link_libraries(flow_test PRIVATE tins boost_unit_test_framework)
   add_test(flow_test ./flow_test)
 endif (BUILD_TESTS)
+
+add_executable(netwhere main.cpp netwhere.cpp flow_collector.cpp)
+target_link_libraries(netwhere PRIVATE tins microhttpd)
+target_compile_features(netwhere PUBLIC cxx_auto_type cxx_generalized_initializers)
+install(TARGETS netwhere DESTINATION bin)
+
+if (ENABLE_LOGGING)
+  target_compile_definitions(netwhere PRIVATE ENABLE_LOGGING)
+endif (ENABLE_LOGGING)
 
 find_package(Doxygen)
 if (DOXYGEN_FOUND)
